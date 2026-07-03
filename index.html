@@ -407,7 +407,7 @@ const SAVEKEY='myskme_valley_v1',PKEY='myskme_pet_v1';
 const DEV={on:new URLSearchParams(location.search).get('dev')==='1',
   get off(){return +(sessionStorage.getItem('petDevOff')||0)},
   set off(v){sessionStorage.setItem('petDevOff',v)}};
-const NOW=()=>Date.now()+DEV.off;
+const NOW=()=>Date.now()+(DEV.on?DEV.off:0); // dev 快进偏移只在 ?dev=1 生效，绝不泄漏到正式存档
 function todayStr(t){const d=new Date(t||NOW());return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
 function dayIdx(t){const d=new Date(t||NOW());return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5)}
 function ago(ts){const m=Math.max(1,Math.round((NOW()-ts)/6e4));if(m<60)return m+' 分钟前';const h=Math.round(m/60);if(h<24)return h+' 小时前';return Math.round(h/24)+' 天前'}
@@ -605,7 +605,12 @@ function defPet(){return {v:1,uid:'',name:'',born:0,hatched:0,stage:0,form:'',xp
   checkin:'',careD:0,ownerName:'',trip:{loc:'l1',t0:0},mail:[],dex:{items:[],locs:[],forms:[]},codes:[],
   comp:0,compW:0,compWid:'',friendsX:[],cloudTok:'',patDay:'',patN:0,pxDay:'',pxV:0,seq:0,seen:{},ts:0}}
 function patchPet(p){const d=defPet();for(const k in d)if(p[k]===undefined)p[k]=d[k];
-  if(!p.trip||!p.trip.loc)p.trip={loc:'l1',t0:NOW()};return p}
+  if(!p.trip||!p.trip.loc)p.trip={loc:'l1',t0:NOW()};
+  p.dex=Object.assign({items:[],locs:[],forms:[]},p.dex); // 深补嵌套子键：旧档 dex 缺 forms 时觉醒会崩
+  p.diet=Object.assign({k:0,s:0,p:0},p.diet);
+  ['dex.items','dex.locs','dex.forms'].forEach(k=>{const[a,b]=k.split('.');if(!Array.isArray(p[a][b]))p[a][b]=[]});
+  if(!Array.isArray(p.friendsX))p.friendsX=[];if(!Array.isArray(p.mail))p.mail=[];if(!Array.isArray(p.codes))p.codes=[];
+  return p}
 function loadPet(){
   const meta=freshMeta();METAREF=meta;
   let a=(meta&&meta.pet&&typeof meta.pet==='object')?meta.pet:null,b=null;
@@ -757,7 +762,9 @@ function doAwaken(id){if(P.stage>=4)return;const f=formOf(id);if(!f)return;
 function settle(){if(!P||P.stage===0){ // 蛋只算时间孵化
     if(P&&P.stage===0)checkGrow();return}
   const t0=Math.max(P.trip.t0||0,P.hatched||0);if(!t0){P.trip.t0=NOW();return}
-  const away=NOW()-t0;if(away<30*6e4){setTrip('nap');return}
+  const away=NOW()-t0;
+  if(away<0){P.trip.t0=NOW();petSave();setTrip('nap');return} // 设备时钟回拨：重置基准，不产生负时长
+  if(away<30*6e4){setTrip('nap');return}
   const hours=Math.min(away/36e5,72);
   let n=clamp(Math.floor(hours/6),1,4);
   const idn=identity();
@@ -783,8 +790,8 @@ function settle(){if(!P||P.stage===0){ // 蛋只算时间孵化
     newMails.push({id,loc:EVDB[id].loc==='*'?P.trip.loc:EVDB[id].loc,rar:EVDB[id].rar,ts:NOW()-Math.floor((n-1-i)*36e5*2),rd:0,ag:again?1:0,
       ps:(P.streak>=7&&Math.random()<.6)?Math.floor(Math.random()*PSPOOL.length):-1});
     recent.push(id)}
-  if(backlog&&newMails.length)sysMailObj('backlog','行囊满满地回来啦','这些天我走了好多地方，行囊都快装不下了。\n挑了最想讲的写给你——剩下的，见面再说。',newMails.length);
   newMails.forEach(m=>P.mail.unshift(m));
+  if(backlog&&newMails.length)sysMailObj('backlog','行囊满满地回来啦','这些天我走了好多地方，行囊都快装不下了。\n挑了最想讲的写给你——剩下的，见面再说。'); // 摘要信最后 unshift，排在最上方
   P.mail=P.mail.slice(0,60);
   /* 被动成长 */
   const td=todayStr();if(P.pxDay!==td){P.pxDay=td;P.pxV=0}
@@ -988,7 +995,7 @@ function renderMailBadge(){const n=P?P.mail.filter(m=>!m.rd).length:0;
   $('#mailDot').classList.toggle('on',n>0)}
 function cmpDay(a,b){const pa=a.split('-').map(Number),pb=b.split('-').map(Number);
   return (pa[0]*372+pa[1]*31+pa[2])-(pb[0]*372+pb[1]*31+pb[2])}
-function esc(s){return String(s||'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}
+function esc(s){return String(s||'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]))}
 /* 摸摸 */
 $('#petBreath').addEventListener('pointerdown',e=>{if(!P)return;ac();
   const w=$('#petBreath');w.classList.remove('squish');void w.offsetWidth;w.classList.add('squish');
@@ -1170,10 +1177,12 @@ let palTab='visit';
 $$('#vPals .tab').forEach(t=>t.addEventListener('click',()=>{sfx('tap');palTab=t.dataset.p;
   $$('#vPals .tab').forEach(x=>x.classList.toggle('cur',x===t));renderPals()}));
 function petStrParse(s){if(!s)return null;const p=String(s).split('|');
-  if(!(+p[0]))return null;
-  return {stage:+p[0]||1,form:p[1]||'',streak:+p[2]||0,compW:+p[3]||0,name:p[4]||''}}
+  const stage=+p[0];if(!stage)return null;
+  const rawForm=String(p[1]||'');const form=formOf(rawForm)?rawForm:''; // 白名单：只认5个已知因子id，否则丢弃
+  return {stage:clamp(stage,1,4),form,streak:+p[2]||0,compW:+p[3]||0,name:String(p[4]||'')}}
 function petThumb(info){if(!info)return '<span style="font-size:20px;color:var(--ink4)">✧</span>';
-  const src=info.form?(PET_ART+'pet_awk_'+info.form+'_happy.webp'):(PET_ART+'pet_s'+clamp(info.stage,1,3)+'_happy.webp');
+  const f=info.form&&formOf(info.form)?info.form:''; // 二次白名单守卫（防未过 petStrParse 的直接调用）
+  const src=f?(PET_ART+'pet_awk_'+f+'_happy.webp'):(PET_ART+'pet_s'+clamp(info.stage,1,3)+'_happy.webp');
   return `<img src="${src}" onerror="this.outerHTML='<span style=&quot;font-size:20px;color:var(--gold3)&quot;>✧</span>'">`}
 async function renderPals(){const B=$('#palsBody');
   $('#palsNote').textContent=MOCK?'本地演示数据 · 上线后为真实往来':'';
@@ -1204,7 +1213,7 @@ async function renderPals(){const B=$('#palsBody');
       return `<div class="frow" style="animation-delay:${Math.min(i*.06,.5)}s">
       <div class="fp">${petThumb(pi)}</div>
       <div class="fm"><div class="fn">${esc((p&&p.name)||'未知旅人')}${pi&&pi.name?' · <span style="color:var(--gold2)">'+esc(pi.name)+'</span>':''}</div>
-      <div class="fs">${pi?(st+' · 连'+pi.streak+'天 · 本周陪伴 '+pi.compW):(p?'还没有星灵':'名片没拉到')} · ♥${(p&&p.likes)||0}</div></div>
+      <div class="fs">${pi?(st+' · 连'+(+pi.streak||0)+'天 · 本周陪伴 '+(+pi.compW||0)):(p?'还没有星灵':'名片没拉到')} · ♥${(p&&+p.likes)||0}</div></div>
       <button class="patBtn" data-pat="${esc(id)}">摸 摸</button></div>`}).join('')||'';
     $$('#palList [data-pat]').forEach(b=>b.onclick=async()=>{b.disabled=true;
       const rc=b.getBoundingClientRect();
@@ -1220,11 +1229,11 @@ async function renderPals(){const B=$('#palsBody');
     if(palTab!=='board')return;
     const top=(r&&r.top)||[];
     B.innerHTML=`<div style="font-size:11.5px;color:var(--ink3);letter-spacing:.1em;line-height:2;margin:2px 2px 12px">
-      我的本周陪伴度 <b style="color:var(--gold2)">${P.compW||0}</b>${r&&r.rank?' · 第 <b style="color:var(--gold2)">'+r.rank+'</b> 名 / '+(r.total||top.length)+' 人':''}<br>
+      我的本周陪伴度 <b style="color:var(--gold2)">${+P.compW||0}</b>${r&&r.rank?' · 第 <b style="color:var(--gold2)">'+(+r.rank||0)+'</b> 名 / '+(+r.total||top.length)+' 人':''}<br>
       <span style="font-size:10px;color:var(--ink4)">签到、喂食、摸摸都攒陪伴度 · 每周重新数 · 不比战力只比心意</span></div>`+
       (top.length?top.map((x,i)=>`<div class="brow ${i===0?'top1':''} ${x.id===idn.id?'me':''}" style="animation-delay:${Math.min(i*.05,.6)}s">
         <span class="rk">${i+1}</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.name||'旅人')}</span>
-        <b style="color:var(--gold2)">${x.score}</b></div>`).join(''):'<div class="mailEmpty">本周还没有人上榜——<br>第一个当然是你。</div>')}}
+        <b style="color:var(--gold2)">${+x.score||0}</b></div>`).join(''):'<div class="mailEmpty">本周还没有人上榜——<br>第一个当然是你。</div>')}}
 /* ================= 孵化仪式 ================= */
 const HL=['那一夜，没有月，也没有星。','所有的光，都来自<em>地上的人</em>。','有一粒光没有烧完——<br>它落回大地，等一个名字。'];
 let ritTaps=0;
