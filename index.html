@@ -382,7 +382,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:2;opa
     <div class="drow"><div>音效<div class="sub">摸摸的咕噜声、拆信的沙沙声</div></div><div class="sw on" id="swSnd"></div></div>
     <div class="drow"><div>考试周冻结符 ×<span id="frzN">1</span><div class="sub">用后 7 天断签不清连续天数 · 它会等你考完</div></div><button class="mbtn" id="bFrz">使 用</button></div>
     <div class="drow" style="display:block">
-      <div>兑换码<div class="sub">卷尾的知识结晶、活动码都在这儿兑</div></div>
+      <div>兑换码<div class="sub">试卷卷号、活动码都在这儿兑——做过的卷子就是粮</div></div>
       <input id="codeIn" placeholder="输入兑换码" autocomplete="off">
       <button class="mbtn" id="bCode" style="width:100%">兑 换</button>
     </div>
@@ -585,8 +585,16 @@ const FORMS=[
  {id:'snake',n:'夜蟒因子',rar:'UR',hint:'夜里发生的事，夜里才知道',hidden:true}];
 function formOf(id){return FORMS.find(f=>f.id===id)}
 function preheatForm(id){['joy','happy','miss','blink'].forEach(m=>{const i=new Image();i.src=PET_ART+'pet_awk_'+id+'_'+m+'.webp'})}
-/* 兑换码 */
+/* 兑换码（活动码） */
 const PET_CODES={MYSKME:{dust:20,msg:'相遇的见面礼'},S1DEMO:{crys:5,msg:'知识结晶 · 试读装'},WOLF2026:{crys:3,msg:'狼先生的嘉奖'}};
+/* 学习管线：hub 题库书架目录即卷号registry——每套已发布试卷的卷号都是有效星灵码 */
+const BANKS_URL='https://myskme.github.io/myskme-hub/banks/index.json';
+let BANKS=null,_bankT=0;
+async function bankCatalog(){
+  if(BANKS&&(NOW()-_bankT)<6e5)return BANKS;
+  try{const r=await fetch(BANKS_URL,{cache:'no-cache'});const d=await r.json();
+    if(d&&Array.isArray(d.catalog)){BANKS=d.catalog;_bankT=NOW()}}catch(e){}
+  return BANKS||[]}
 /* 阶段 */
 const STAGES=[{n:'星蛋',need:30},{n:'幼年星灵',need:300},{n:'少年星灵',need:900},{n:'星灵 · 成体',need:2000}];
 /* ================= 存档（双写协议） ================= */
@@ -1279,15 +1287,26 @@ $('#bFrz').addEventListener('click',()=>{if(!P)return;
   $('#frzN').textContent=P.freeze;renderHome();sfx('rare');
   toast('❄ 考试周模式开启：它把灯芯捻小了，坐在蛋壳灯边等你考完',3400)});
 /* 兑换码 */
-function tryCode(raw){if(!P)return;const c=String(raw||'').trim().toUpperCase();
-  if(!c)return;const def=PET_CODES[c];
-  if(!def){toast('这个码……星灵歪着头看不懂');sfx('tap');return}
+async function tryCode(raw){if(!P)return;const c=String(raw||'').trim().toUpperCase();
+  if(!c)return;
   if(P.codes.includes(c)){toast('这个码已经兑过啦');return}
+  const def=PET_CODES[c];
+  if(def){P.codes.push(c);
+    if(def.dust)P.dust+=def.dust;
+    if(def.crys)P.crys+=def.crys;
+    petSave();renderHome();sfx('rare');flash();
+    toast('✨ '+def.msg+' · '+(def.crys?('知识结晶 +'+def.crys):('星尘 +'+def.dust)),3000);
+    $('#codeIn').value='';return}
+  /* 卷号兑换：做过的试卷就是粮 */
+  const cat=await bankCatalog();
+  const bank=cat.find(b=>String(b.code||'').toUpperCase()===c);
+  if(!bank){toast('这个码……星灵歪着头看不懂');sfx('tap');return}
+  if(P.codes.includes(c))return;
   P.codes.push(c);
-  if(def.dust){P.dust+=def.dust}
-  if(def.crys){P.crys+=def.crys}
+  const n=Math.max(1,Math.min(9,(+bank.petCrys)||3));
+  P.crys+=n;
   petSave();renderHome();sfx('rare');flash();
-  toast('✨ '+def.msg+' · '+(def.crys?('知识结晶 +'+def.crys):('星尘 +'+def.dust)),3000);
+  toast('📖 《'+esc(String(bank.name||c).slice(0,20))+'》的知识凝成了结晶 · 💠 +'+n,3400);
   $('#codeIn').value=''}
 $('#bCode').addEventListener('click',()=>tryCode($('#codeIn').value));
 /* ?code= 自动填入 */
