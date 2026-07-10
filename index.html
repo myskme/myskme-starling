@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0a0a0c">
 <title>星灵 · MYSKME</title>
 <style>
-/* ============ 星灵远征 · BUILD petDemo-20260703a · 黑金编年史 ============ */
+/* ============ 星灵远征 · BUILD pet-20260711a (M3: 夜蟒解锁/化形/心意对拼) · 黑金编年史 ============ */
 :root{
   --bg:#0a0a0c; --bg2:#111114; --bg3:#16161a; --bg4:#1c1c22;
   --ink:#f0e6d2; --ink2:#a8a090; --ink3:#6a6458; --ink4:#3a382f;
@@ -276,15 +276,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:2;opa
   font-family:monospace;padding:5px 8px;border-radius:3px}
 @media (max-height:640px){#petZone{min-height:150px}}
 </style>
-
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227%22%20fill%3D%22%2317140f%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%23c9a24d%22%20stroke-width%3D%222%22/%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%222.6%22%20fill%3D%22%23c9a24d%22/%3E%3C/svg%3E">
-<meta name="description" content="蛋到觉醒五形态；你不在时，它替你远征，寄回一封寓言信。单文件离线。">
-<meta property="og:title" content="星灵远征 · MYSKME 电子宠物">
-<meta property="og:description" content="蛋到觉醒五形态；你不在时，它替你远征，寄回一封寓言信。单文件离线。">
-<meta property="og:type" content="website">
-<meta property="og:image" content="https://myskme.github.io/myskme-starling/og-cover.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://myskme.github.io/myskme-starling/og-cover.png">
 </head>
 <body>
 <canvas id="sky"></canvas><div id="vig"></div>
@@ -612,7 +603,8 @@ function freshMeta(){try{const m=JSON.parse(localStorage.getItem(SAVEKEY));retur
 function defPet(){return {v:1,uid:'',name:'',born:0,hatched:0,stage:0,form:'',xp:0,
   diet:{k:0,s:0,p:0},dust:0,crys:0,mood:2,streak:0,streakBest:0,lastCare:'',freeze:1,frozenUntil:'',
   checkin:'',careD:0,ownerName:'',trip:{loc:'l1',t0:0},mail:[],dex:{items:[],locs:[],forms:[]},codes:[],
-  comp:0,compW:0,compWid:'',friendsX:[],cloudTok:'',patDay:'',patN:0,pxDay:'',pxV:0,seq:0,seen:{},ts:0}}
+  comp:0,compW:0,compWid:'',friendsX:[],cloudTok:'',patDay:'',patN:0,pxDay:'',pxV:0,seq:0,seen:{},ts:0,
+  nightD:0,nightId:'',chal:null}}
 function patchPet(p){const d=defPet();for(const k in d)if(p[k]===undefined)p[k]=d[k];
   if(!p.trip||!p.trip.loc)p.trip={loc:'l1',t0:NOW()};
   p.dex=Object.assign({items:[],locs:[],forms:[]},p.dex); // 深补嵌套子键：旧档 dex 缺 forms 时觉醒会崩
@@ -768,7 +760,32 @@ function doAwaken(id){if(P.stage>=4)return;const f=formOf(id);if(!f)return;
   petSave();petProfilePush();
   rite('觉 醒 之 夜','✧ '+P.name+' · '+f.n+' · '+f.rar+' ✧',()=>{renderHome();renderMailBadge();
     toast('✦ 它把这一夜写成了信');sfx('rare')})}
-function settle(){if(!P||P.stage===0){ // 蛋只算时间孵化
+/* ===== M3 · 夜蟒（snake）解锁：深夜照料 7 个不同的夜 ===== */
+function nightIdOf(){return todayStr(NOW()-5*36e5)} // 23:00~次日04:59 归同一「夜」（统一减5小时）
+function isNight(){const h=new Date(NOW()).getHours();return h>=23||h<5}
+function noteNight(){if(!P||P.stage===0||!isNight())return;
+  const nid=nightIdOf();if(P.nightId===nid)return;
+  P.nightId=nid;P.nightD=(P.nightD||0)+1;
+  const unlocked=P.dex.forms.includes('snake');
+  if(!unlocked&&P.stage>=4){
+    if(P.nightD>=7){nightAwaken();return}
+    if(P.nightD===3)toast('✦ 它今晚一直望着裂隙的方向');
+    else if(P.nightD===5)toast('✦ 夜里有什么在等它——还差两个夜');
+    else toast('✦ 深夜的陪伴，它记下了（夜访 '+P.nightD+'）')}}
+function nightAwaken(){const f=formOf('snake');if(!f||P.dex.forms.includes('snake'))return;
+  P.form='snake';P.mood=3;
+  P.dex.forms.push('snake');
+  preheatForm('snake');
+  sysLetter('awaken2','夜之觉醒',AWAKEN_TXT.snake);
+  petSave();petProfilePush();
+  rite('夜 之 觉 醒','✧ '+P.name+' · '+f.n+' · '+f.rar+' ✧',()=>{renderHome();renderMailBadge();
+    toast('✦ 夜里发生的事，夜里才知道');sfx('rare')})}
+/* 化形：已收集的觉醒形态可切换 */
+function morphTo(id){if(!P||P.stage<4||!P.dex.forms.includes(id)||P.form===id)return;
+  P.form=id;preheatForm(id);petSave();petProfilePush();
+  toast('✧ 化形 · '+((formOf(id)||{}).n||''));sfx('rare');renderHome()}
+function settle(){if(P)chalSettle(); // M3: 周翻页先结算对拼（compW 尚未被新周动作清零）
+  if(!P||P.stage===0){ // 蛋只算时间孵化
     if(P&&P.stage===0)checkGrow();return}
   const t0=Math.max(P.trip.t0||0,P.hatched||0);if(!t0){P.trip.t0=NOW();return}
   const away=NOW()-t0;
@@ -1014,7 +1031,7 @@ $('#petBreath').addEventListener('pointerdown',e=>{if(!P)return;ac();
   P.diet.p++;
   if(P.patN<3){P.patN++;P.dust++;floatNum($('#petZone'),'+1 ✦');sfx('coin')}
   P.mood=clamp(P.mood+ (P.mood<2?1:0),0,3);addComp(1);
-  petSave();renderHome()});
+  noteNight();petSave();renderHome()});
 /* 签到 */
 $('#bCheck').addEventListener('click',()=>{if(!P)return;const td=todayStr();
   if(P.checkin===td)return;
@@ -1029,7 +1046,7 @@ $('#bCheck').addEventListener('click',()=>{if(!P)return;const td=todayStr();
   if(P.streak===7){toast('✨ 连续 7 天！远征更容易遇见稀罕事了');sfx('rare')}
   if(P.streak===14&&P.freeze<3){P.freeze++;toast('❄ 获得一枚冻结符（考试周护身）')}
   if(P.streak===30&&!P.dex.items.includes('i13')){toast('🌟 连续三十天！它一定有话想对你说');}
-  petSave();renderHome()});
+  noteNight();petSave();renderHome()});
 /* 喂食 */
 function feed(kind){if(!P)return;
   const cost=kind==='k'?{crys:1}:{dust:5},xp=kind==='k'?40:8;
@@ -1048,7 +1065,7 @@ function feed(kind){if(!P)return;
     if(kind==='k'){flash();burst(z.left+z.width/2,z.top+z.height/2,26);sfx('rare')}
     floatNum($('#petZone'),'+'+xp,kind==='k'?'#e8c768':'');
     P.mood=3;P.lastCare=todayStr();addComp(kind==='k'?5:2);
-    grantXp(xp,kind);petSave();renderHome()},520)}
+    noteNight();grantXp(xp,kind);petSave();renderHome()},520)}
 $('#bFeedS').addEventListener('click',()=>feed('s'));
 $('#bFeedC').addEventListener('click',()=>feed('k'));
 /* ================= 信箱 ================= */
@@ -1159,13 +1176,17 @@ function renderDex(){$('#dexDot').classList.remove('on');const B=$('#dexBody');
         const nm=ok?f.n:(f.hidden?'？？？':f.n);
         const ic=ok?`<img src="${PET_ART}pet_awk_${f.id}_happy.webp" style="width:44px;height:44px;object-fit:contain">`
                    :'<span style="font-size:22px;color:var(--ink4)">？</span>';
+        /* M3: 已觉醒后，夜蟒条目亮出夜访进度；已收集形态可化形 */
+        const hint=(f.id==='snake'&&!ok&&P.stage>=4)?('夜访 '+(P.nightD||0)+' / 7 · 深夜（23 点后）来看它'):f.hint;
+        const morph=(ok&&P.stage>=4)?('<button class="patBtn" data-morph="'+f.id+'" style="margin-top:6px;font-size:10px;padding:3px 12px"'+(P.form===f.id?' disabled':'')+'>'+(P.form===f.id?'当前':'化形')+'</button>'):'';
         return `<div class="dxc ${ok?'got':'lock'}" style="animation-delay:${i*.05}s">
         <div class="ic">${ic}</div>
         <div class="nm">${nm}</div>
-        ${ok?'<div style="font-size:9px" class="r-'+f.rar+'">'+f.rar+'</div>'
-            :'<div style="font-size:8.5px;color:var(--ink4);padding:0 6px;text-align:center;line-height:1.6">'+f.hint+'</div>'}</div>`}).join('')+
+        ${ok?'<div style="font-size:9px" class="r-'+f.rar+'">'+f.rar+'</div>'+morph
+            :'<div style="font-size:8.5px;color:var(--ink4);padding:0 6px;text-align:center;line-height:1.6">'+hint+'</div>'}</div>`}).join('')+
       '</div><div style="font-size:10.5px;color:var(--ink4);letter-spacing:.1em;text-align:center;margin-top:16px;line-height:2">'+
-      (got.length?'它记得你是怎么喂它的——这就是答案。':'它长大之后，会记得你是怎么喂它的。<br>——觉醒之夜见。')+'</div>'}}
+      (got.length?'它记得你是怎么喂它的——这就是答案。':'它长大之后，会记得你是怎么喂它的。<br>——觉醒之夜见。')+'</div>';
+    $$('#dexBody [data-morph]').forEach(b=>b.onclick=()=>{morphTo(b.dataset.morph);renderDex()})}}
 function pcArtInner(loc){const m=pcArt(loc);return m.slice(m.indexOf('>')+1).replace('</svg></div>','').replace(/<div[^>]*>/,'').replace('<svg viewBox="0 0 160 74" width="100%" style="display:block">','')}
 /* ================= 远征地图 ================= */
 function renderMap(){const L=$('#mapList');
@@ -1193,6 +1214,29 @@ function petThumb(info){if(!info)return '<span style="font-size:20px;color:var(-
   const f=info.form&&formOf(info.form)?info.form:''; // 二次白名单守卫（防未过 petStrParse 的直接调用）
   const src=f?(PET_ART+'pet_awk_'+f+'_happy.webp'):(PET_ART+'pet_s'+clamp(info.stage,1,3)+'_happy.webp');
   return `<img src="${src}" onerror="this.outerHTML='<span style=&quot;font-size:20px;color:var(--gold3)&quot;>✧</span>'">`}
+/* ===== M3 · 好友挑战「心意对拼」：零后端，走名片 compW ===== */
+function setChal(id,name){if(!P)return;
+  P.chal={id:String(id),wid:weekId(),name:name||'星友',theirs:null,mine:+P.compW||0};
+  petSave();toast('✧ 对拼开始 · 这周比比谁的心意多');sfx('coin')}
+function chalCard(){if(!P||!P.chal||P.chal.wid!==weekId())return '';
+  const mine=+P.compW||0,th=(P.chal.theirs==null?'—':+P.chal.theirs);
+  return `<div class="frow" style="border-color:var(--gold3);background:rgba(157,114,214,.06)">
+    <div class="fm" style="flex:1"><div class="fn">⚔ 本周心意对拼 · ${esc(P.chal.name||'星友')}</div>
+    <div class="fs">我 <b id="chalMine" style="color:var(--gold2)">${mine}</b> ： <b id="chalTheirs" style="color:var(--gold2)">${th}</b> TA · 周翻页时它会写信宣布结果</div></div>
+    <button class="patBtn" id="chalOff">不比了</button></div>`}
+function chalSettle(){if(!P||!P.chal)return;
+  if(P.chal.wid===weekId())return;
+  const c=P.chal;P.chal=null;
+  /* compW 在新周首次 addComp 才清零；settle 在开机即跑，此时 P.compW 通常仍是上周值 */
+  const mine=(P.compWid===c.wid)?(+P.compW||0):(+c.mine||0);
+  const th=(c.theirs==null?null:+c.theirs);
+  let v;
+  if(th==null)v='对面的数字我没打听到——那就当我们赢了气势。';
+  else if(mine>th)v='这周是我们多！我把尾巴翘了一整晚。';
+  else if(mine<th)v='这周是 TA 家多一点。没关系——心意这种事，下周我们攒回来。';
+  else v='不多不少，打了个平手。这种缘分比输赢还稀罕。';
+  sysLetter('chal','对拼战报 · 上周','上周我们和 '+(c.name||'星友')+' 家比心意：我这边记下的是 '+mine+'，TA 家记到 '+(th==null?'？':th)+'。\n'+v+'\n（心意＝签到、喂食、摸摸攒下的陪伴度）');
+  petSave();if(typeof renderMailBadge==='function')renderMailBadge()}
 async function renderPals(){const B=$('#palsBody');
   $('#palsNote').textContent=MOCK?'本地演示数据 · 上线后为真实往来':'';
   if(palTab==='visit'){
@@ -1208,22 +1252,34 @@ async function renderPals(){const B=$('#palsBody');
       <input id="palIn" placeholder="粘贴朋友的星友码" autocomplete="off">
       <button class="patBtn" id="palAdd">添 加</button>
     </div>
+    ${chalCard()}
     <div id="palList">${fr.length?'<div class="mailEmpty">正在去串门……</div>':'<div class="mailEmpty">还没有星友。<br>把你的星友码发给朋友——<br>去看看彼此的星灵吧。</div>'}</div>`;
     $('#copyId').onclick=()=>{sfx('tap');
       if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(idn.id).then(()=>toast('已复制星友码 · 发给朋友吧'),()=>toast(idn.id));
       else toast(idn.id)};
+    const co=$('#chalOff');if(co)co.onclick=()=>{P.chal=null;petSave();sfx('tap');renderPals()};
     $('#palAdd').onclick=()=>{if(addFriend($('#palIn').value)){$('#palIn').value='';sfx('coin');toast('✧ 星友已添加');renderPals()}};
     if(!fr.length)return;
     const r=await lbPost({action:'pmget',ids:fr.slice(0,50)});
     if(palTab!=='visit')return;
     const profs=(r&&r.profiles)||{};
+    /* M3: 刷新对拼双方数值缓存（结算兜底用） */
+    if(P.chal&&P.chal.wid===weekId()){P.chal.mine=+P.compW||0;
+      const cp=profs[P.chal.id];
+      if(cp){const cpi=petStrParse(cp.pet);P.chal.theirs=cpi?(+cpi.compW||0):0;if(cp.name)P.chal.name=cp.name}
+      petSave();
+      const cm=$('#chalMine'),ct=$('#chalTheirs');
+      if(cm)cm.textContent=+P.compW||0;
+      if(ct)ct.textContent=(P.chal.theirs==null?'—':P.chal.theirs)}
     $('#palList').innerHTML=fr.map((id,i)=>{const p=profs[id];const pi=p?petStrParse(p.pet):null;
       const st=pi?(pi.form?'✦ 觉醒 · '+((formOf(pi.form)||{}).n||''):(STAGES[pi.stage]?STAGES[pi.stage].n:'星灵')):null;
       return `<div class="frow" style="animation-delay:${Math.min(i*.06,.5)}s">
       <div class="fp">${petThumb(pi)}</div>
       <div class="fm"><div class="fn">${esc((p&&p.name)||'未知旅人')}${pi&&pi.name?' · <span style="color:var(--gold2)">'+esc(pi.name)+'</span>':''}</div>
       <div class="fs">${pi?(st+' · 连'+(+pi.streak||0)+'天 · 本周陪伴 '+(+pi.compW||0)):(p?'还没有星灵':'名片没拉到')} · ♥${(p&&+p.likes)||0}</div></div>
+      <button class="patBtn" data-chal="${esc(id)}" data-chaln="${esc((p&&p.name)||'')}"${(P.chal&&P.chal.wid===weekId()&&P.chal.id===String(id))?' disabled':''}>对 拼</button>
       <button class="patBtn" data-pat="${esc(id)}">摸 摸</button></div>`}).join('')||'';
+    $$('#palList [data-chal]').forEach(b=>b.onclick=()=>{setChal(b.dataset.chal,b.dataset.chaln);renderPals()});
     $$('#palList [data-pat]').forEach(b=>b.onclick=async()=>{b.disabled=true;
       const rc=b.getBoundingClientRect();
       const rr=await lbPost({action:'plike',id:b.dataset.pat,by:identity().id,on:true});
