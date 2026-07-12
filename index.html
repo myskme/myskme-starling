@@ -13,7 +13,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307080d'/%3E%3Ccircle cx='32' cy='34' r='17' fill='%23101424' stroke='%23c9a64a' stroke-width='3'/%3E%3Cpath d='M32 7l4.2 9.8L46 21l-9.8 4.2L32 35l-4.2-9.8L18 21l9.8-4.2z' fill='%23e8c768'/%3E%3Ccircle cx='25' cy='34' r='2.8' fill='%23f0e6d2'/%3E%3Ccircle cx='39' cy='34' r='2.8' fill='%23f0e6d2'/%3E%3Cpath d='M25 43q7 5 14 0' fill='none' stroke='%23e8c768' stroke-width='2.8' stroke-linecap='round'/%3E%3C/svg%3E">
 <title>星灵 · MYSKME</title>
 <style>
-/* ============ 星灵远征 · BUILD pet-20260711b (M4: 美术系统/图标/地点卡增强) · 黑金编年史 ============ */
+/* ============ 星灵远征 · BUILD pet-20260712a (M5: 星愿/路线/探索里程碑) · 黑金编年史 ============ */
 :root{
   --bg:#0a0a0c; --bg2:#111114; --bg3:#16161a; --bg4:#1c1c22;
   --ink:#f0e6d2; --ink2:#a8a090; --ink3:#6a6458; --ink4:#3a382f;
@@ -38,6 +38,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:2;opa
 /* ---- 视图 ---- */
 .view{position:absolute;inset:0;padding-top:calc(var(--sat) + 8px);display:none;flex-direction:column;overflow:hidden}
 .view.on{display:flex}
+#vHome{padding-bottom:calc(66px + var(--sab))}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px calc(90px + var(--sab))}
 /* ---- 顶栏 ---- */
 #hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 6px}
@@ -86,6 +87,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:2;opa
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
   animation:sheen 2.4s ease-in-out infinite}
 @keyframes sheen{55%,100%{transform:translateX(100%)}}
+/* 今日星愿：主屏的轻量回访目标 */
+#dailyStrip{margin:0 16px 8px;width:calc(100% - 32px);border:1px solid var(--line2);border-radius:3px;
+  background:linear-gradient(90deg,rgba(201,166,74,.08),rgba(157,114,214,.045));color:var(--ink2);
+  min-height:38px;padding:7px 11px;display:flex;align-items:center;gap:9px;font-family:var(--serif);text-align:left}
+#dailyStrip:active{transform:scale(.988)}
+#dailyStrip .wishIco{width:20px;height:20px;color:var(--gold2);flex:none}
+#dailyStrip .wishCopy{flex:1;min-width:0}
+#dailyStrip .wishTitle{font-size:11.5px;letter-spacing:.13em;color:var(--ink)}
+#dailyStrip .wishSub{font-size:9.5px;color:var(--ink3);letter-spacing:.08em;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wishDots{display:flex;gap:4px;flex:none}.wishDots i{width:6px;height:6px;border:1px solid var(--gold3);border-radius:50%;display:block}
+.wishDots i.on{background:var(--gold2);box-shadow:0 0 7px rgba(232,199,104,.65)}
 /* 操作区 */
 #acts{display:flex;gap:8px;margin:0 16px 8px}
 .abtn{flex:1;border:1px solid var(--line);background:linear-gradient(180deg,var(--bg3),var(--bg2));
@@ -214,6 +226,25 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:2;opa
 .locCard.lock{opacity:.5}
 .locCard .flag{position:absolute;top:8px;right:10px;font-size:10px;letter-spacing:.2em;color:var(--gold2);
   border:1px solid var(--gold3);padding:2px 8px;border-radius:2px;background:rgba(10,10,12,.7)}
+/* 远征路线与星愿簿 */
+.routePanel{border:1px solid var(--line);border-radius:3px;background:linear-gradient(145deg,rgba(201,166,74,.08),rgba(17,17,20,.82));
+  padding:12px;margin-bottom:14px}
+.routeHead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.routeHead b{font-size:12.5px;letter-spacing:.16em;color:var(--gold2);font-weight:400}.routeHead span{font-size:9.5px;color:var(--ink3);letter-spacing:.1em}
+.modeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.modeBtn{border:1px solid var(--line2);border-radius:3px;background:rgba(10,10,12,.42);color:var(--ink3);font-family:var(--serif);
+  padding:8px 4px 7px;text-align:center;font-size:10.5px;letter-spacing:.1em;line-height:1.45}
+.modeBtn svg{display:block;width:19px;height:19px;margin:0 auto 4px;color:currentColor}.modeBtn small{display:block;font-size:8.5px;letter-spacing:.05em;color:var(--ink4)}
+.modeBtn.cur{border-color:var(--gold3);color:var(--gold2);background:rgba(201,166,74,.09);box-shadow:0 0 14px rgba(201,166,74,.08)}
+.explore{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-top:8px}.explore i{display:block;height:100%;background:linear-gradient(90deg,var(--gold3),var(--gold2))}
+.wishCard{border:1px solid var(--line2);border-radius:3px;background:linear-gradient(145deg,var(--bg3),var(--bg2));padding:12px;margin-bottom:9px;
+  display:flex;align-items:center;gap:10px;animation:cardIn .45s both}
+.wishCard.done{border-color:var(--line);background:linear-gradient(145deg,rgba(201,166,74,.08),var(--bg2))}
+.wishMedal{width:38px;height:38px;border:1px solid var(--line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold2);flex:none}
+.wishMedal svg{width:20px;height:20px}.wishMain{flex:1;min-width:0}.wishName{font-size:12.5px;color:var(--ink);letter-spacing:.1em}.wishDesc{font-size:9.5px;color:var(--ink3);margin-top:3px;letter-spacing:.06em;line-height:1.55}
+.wishProg{font-size:10px;color:var(--gold2);margin-top:4px}.claimBtn{border:1px solid var(--gold3);background:rgba(201,166,74,.08);color:var(--gold2);font-family:var(--serif);font-size:10px;
+  letter-spacing:.1em;padding:7px 10px;border-radius:3px;flex:none}.claimBtn:disabled{opacity:.35}.claimBtn.got{border-color:var(--line2);color:var(--ink3)}
+.sectionCap{font-size:11px;color:var(--ink3);letter-spacing:.2em;margin:4px 2px 9px;display:flex;justify-content:space-between}.sectionCap b{font-weight:400;color:var(--gold2)}
 /* ---- 孵化仪式 ---- */
 #vHatch{z-index:50;background:var(--bg);justify-content:center;align-items:center;text-align:center;padding:0 30px}
 #hLines{min-height:120px;width:100%;max-width:330px;margin:0 auto}
@@ -304,7 +335,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:2;opa
 #devBar.on{display:flex}
 #devBar button{background:rgba(20,20,26,.92);border:1px solid #333;color:#8a8;font-size:10px;
   font-family:monospace;padding:5px 8px;border-radius:3px}
-@media (max-height:640px){#petZone{min-height:150px}}
+@media (max-height:700px){#petZone{min-height:145px}#dailyStrip{min-height:34px;padding-top:5px;padding-bottom:5px}.abtn{padding-top:7px}.abtn .actIcon{margin-bottom:3px}}
+@media (max-width:360px){.modeBtn small{display:none}.tabs{gap:5px}.tab{letter-spacing:.08em;font-size:11px}}
 </style>
 </head>
 <body>
@@ -327,6 +359,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:2;opa
       <div id="xpLbl"><span id="xpStage">—</span><span id="xpNum"></span></div>
       <div class="bar"><i id="xpBar" style="width:0%"></i></div>
     </div>
+    <button id="dailyStrip" aria-label="打开今日星愿"></button>
     <div id="streakRow"><span>连续照料 <b id="stkN">0</b> 天</span><span id="frzBadge"></span></div>
     <div id="acts">
       <button class="abtn" id="bCheck">签到<small>✦ 星尘</small></button>
@@ -357,6 +390,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:2;opa
       <div class="tab cur" data-t="items">纪念品</div>
       <div class="tab" data-t="locs">足迹</div>
       <div class="tab" data-t="forms">形态</div>
+      <div class="tab" data-t="wishes">星愿</div>
     </div>
     <div class="scroll" id="dexBody"></div>
   </section>
@@ -429,7 +463,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:2;opa
 <div id="devBar"></div>
 
 <script>
-/* ================= 星灵远征 · petDemo-20260703a ================= */
+/* ================= 星灵远征 · pet-20260712a ================= */
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const SAVEKEY='myskme_valley_v1',PKEY='myskme_pet_v1';
@@ -447,7 +481,11 @@ const UI_PATHS={
   cloud:'<path d="M7 18h10a4 4 0 0 0 .5-8 6 6 0 0 0-11.2 2A3 3 0 0 0 7 18z"/>',
   sound:'<path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16 9c1 1.1 1 4 0 5M18.5 6.5c2.3 2.6 2.3 8.4 0 11"/>',
   code:'<path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14"/>',
-  id:'<path d="M4 6h16v12H4z"/><path d="M8 11h4M8 15h8"/><circle cx="16" cy="10" r="1.6"/>'
+  id:'<path d="M4 6h16v12H4z"/><path d="M8 11h4M8 15h8"/><circle cx="16" cy="10" r="1.6"/>',
+  wish:'<path d="M12 3l2.3 5.4L20 11l-5.7 2.4L12 19l-2.3-5.6L4 11l5.7-2.6z"/><path d="M18 3v4M16 5h4"/>',
+  compass:'<circle cx="12" cy="12" r="8"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+  feather:'<path d="M20 4c-7 0-12 4-12 10 0 2-2 4-4 5"/><path d="M7 16c4-1 7-4 10-8M9 13l4 1M12 10l4 1"/>',
+  book:'<path d="M4 5c3-1 5-.5 8 1v14c-3-1.5-5-2-8-1z"/><path d="M20 5c-3-1-5-.5-8 1v14c3-1.5 5-2 8-1z"/>'
 };
 function uiIcon(id,cls){return `<svg class="${cls||'ui'}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${UI_PATHS[id]||UI_PATHS.dust}</svg>`}
 function decorateStaticIcons(){
@@ -514,6 +552,11 @@ const LOCS={
   l3:{name:'紫蛇森林',seal:'森',need:2,desc:'树叶背面全是紫色。没有坏东西，只有还没打过招呼的东西。'},
   l4:{name:'复读灰塔',seal:'塔',need:2,desc:'童声复读机的余音守着旧塔。有些话说过一遍，就永远有回音。'},
   l5:{name:'断云云阶',seal:'云',need:3,desc:'狼先生一剑断云的地方。云到这里就停下来，像被什么温柔地劝住了。'}};
+const ROUTES={
+  story:{name:'见闻漫游',icon:'feather',tip:'多带一封信',desc:'走慢一点，把沿路的故事都记下来。'},
+  treasure:{name:'寻光拾遗',icon:'compass',tip:'稀有与纪念品',desc:'循着微光，去找行囊里还没有的东西。'},
+  study:{name:'静心修习',icon:'book',tip:'更多离线成长',desc:'边走边读，把路途酿成成长。'}
+};
 const ART={cat:'assets/myskme/blackcat.webp',parrot:'assets/myskme/parrot.webp',wolf:'assets/myskme/wolf.webp',
   lin:'assets/myskme/lin.webp',nuo:'assets/myskme/nuo.webp',yue:'assets/myskme/yue.webp',one:'assets/myskme/one.webp',
   jia:'assets/myskme/jia.webp'};
@@ -659,17 +702,27 @@ const STAGES=[{n:'星蛋',need:30},{n:'幼年星灵',need:300},{n:'少年星灵'
 /* ================= 存档（双写协议） ================= */
 let P=null,METAREF=null;
 function freshMeta(){try{const m=JSON.parse(localStorage.getItem(SAVEKEY));return (m&&typeof m==='object')?m:null}catch(e){return null}}
-function defPet(){return {v:1,uid:'',name:'',born:0,hatched:0,stage:0,form:'',xp:0,
+function defPet(){return {v:2,uid:'',name:'',born:0,hatched:0,stage:0,form:'',xp:0,
   diet:{k:0,s:0,p:0},dust:0,crys:0,mood:2,streak:0,streakBest:0,lastCare:'',freeze:1,frozenUntil:'',
-  checkin:'',careD:0,ownerName:'',trip:{loc:'l1',t0:0},mail:[],dex:{items:[],locs:[],forms:[]},codes:[],
+  checkin:'',careD:0,ownerName:'',trip:{loc:'l1',t0:0,mode:'story'},mail:[],dex:{items:[],locs:[],forms:[]},codes:[],
   comp:0,compW:0,compWid:'',friendsX:[],cloudTok:'',patDay:'',patN:0,pxDay:'',pxV:0,seq:0,seen:{},ts:0,
-  nightD:0,nightId:'',chal:null}}
+  nightD:0,nightId:'',chal:null,wishes:{day:'',pat:0,feed:0,claimed:[],bonus:0},journal:[],journeys:0,
+  lettersRead:0,milestones:[]}}
 function patchPet(p){const d=defPet();for(const k in d)if(p[k]===undefined)p[k]=d[k];
-  if(!p.trip||!p.trip.loc)p.trip={loc:'l1',t0:NOW()};
+  if(!p.trip||!p.trip.loc)p.trip={loc:'l1',t0:NOW(),mode:'story'};
+  p.trip=Object.assign({loc:'l1',t0:NOW(),mode:'story'},p.trip);
+  if(!ROUTES[p.trip.mode])p.trip.mode='story';
   p.dex=Object.assign({items:[],locs:[],forms:[]},p.dex); // 深补嵌套子键：旧档 dex 缺 forms 时觉醒会崩
   p.diet=Object.assign({k:0,s:0,p:0},p.diet);
+  p.wishes=Object.assign({day:'',pat:0,feed:0,claimed:[],bonus:0},p.wishes);
   ['dex.items','dex.locs','dex.forms'].forEach(k=>{const[a,b]=k.split('.');if(!Array.isArray(p[a][b]))p[a][b]=[]});
   if(!Array.isArray(p.friendsX))p.friendsX=[];if(!Array.isArray(p.mail))p.mail=[];if(!Array.isArray(p.codes))p.codes=[];
+  if(!Array.isArray(p.wishes.claimed))p.wishes.claimed=[];
+  if(!Array.isArray(p.journal))p.journal=[];
+  if(!Array.isArray(p.milestones))p.milestones=[];
+  /* 旧档兼容：现有信件即为已经遇见过的旅途内容。 */
+  p.mail.forEach(m=>{if(m&&m.id&&EVDB[m.id]&&!p.journal.includes(m.id))p.journal.push(m.id)});
+  p.v=2;
   return p}
 function loadPet(){
   const meta=freshMeta();METAREF=meta;
@@ -681,6 +734,42 @@ function petSave(){if(!P)return;P.ts=Date.now();
   try{localStorage.setItem(PKEY,JSON.stringify(P))}catch(e){}
   try{const m=freshMeta();
     if(m&&m.unlocked){m.pet=P;m.lastTs=Date.now();localStorage.setItem(SAVEKEY,JSON.stringify(m))}}catch(e){}}
+/* ================= M5 · 星愿与旅途里程碑 ================= */
+function ensureWishes(){if(!P)return null;const td=todayStr();
+  if(!P.wishes||P.wishes.day!==td)P.wishes={day:td,pat:0,feed:0,claimed:[],bonus:0};
+  return P.wishes}
+function dailyTasks(){const w=ensureWishes();return [
+  {id:'check',icon:'check',name:'一声早安',desc:'今天来小窝签到',now:P.checkin===todayStr()?1:0,need:1,reward:{dust:5}},
+  {id:'pat',icon:'wish',name:'掌心星火',desc:'轻轻摸摸星灵 3 次',now:Math.min(w.pat||0,3),need:3,reward:{dust:5}},
+  {id:'feed',icon:'bowl',name:'一餐温暖',desc:'喂一份星尘餐或结晶餐',now:Math.min(w.feed||0,1),need:1,reward:{dust:8}}
+]}
+function rewardText(r){return [r.dust?('✦ '+r.dust):'',r.crys?('💠 '+r.crys):'',r.freeze?('❄ '+r.freeze):''].filter(Boolean).join(' · ')}
+function addReward(r){if(r.dust)P.dust+=r.dust;if(r.crys)P.crys+=r.crys;if(r.freeze)P.freeze=Math.min(9,P.freeze+r.freeze)}
+function wishProgress(k,n){const w=ensureWishes();if(!w)return;w[k]=(w[k]||0)+(n||1)}
+function claimWish(id){const w=ensureWishes(),t=dailyTasks().find(x=>x.id===id);if(!t||t.now<t.need||w.claimed.includes(id))return;
+  w.claimed.push(id);addReward(t.reward);addComp(1);petSave();sfx('coin');renderHome();renderDex();
+  toast('✦ 星愿完成 · '+t.name+' · '+rewardText(t.reward))}
+function claimWishBonus(){const w=ensureWishes(),all=dailyTasks();if(w.bonus||!all.every(t=>w.claimed.includes(t.id)))return;
+  w.bonus=1;addReward({crys:1});addComp(3);petSave();sfx('rare');flash();renderHome();renderDex();
+  toast('✨ 今日星愿全部点亮 · 知识结晶 +1',2800)}
+const MILESTONES=[
+  {id:'road1',icon:'compass',name:'第一次远行',desc:'完成 1 次有效远征',need:1,get:()=>P.journeys||0,reward:{dust:12}},
+  {id:'letter5',icon:'mail',name:'把故事收好',desc:'读完 5 封远征来信',need:5,get:()=>P.lettersRead||0,reward:{crys:1}},
+  {id:'item5',icon:'bag',name:'小小收藏家',desc:'收集 5 件纪念品',need:5,get:()=>P.dex.items.length,reward:{crys:1}},
+  {id:'loc3',icon:'map',name:'路认得你了',desc:'点亮 3 处远征足迹',need:3,get:()=>P.dex.locs.length,reward:{dust:20}},
+  {id:'pat20',icon:'wish',name:'心有灵犀',desc:'累计摸摸 20 次',need:20,get:()=>P.diet.p||0,reward:{dust:20}},
+  {id:'streak7',icon:'check',name:'七日星光',desc:'最高连续照料达到 7 天',need:7,get:()=>P.streakBest||0,reward:{freeze:1}},
+  {id:'grow2',icon:'book',name:'听懂远风',desc:'成长为少年星灵',need:2,get:()=>P.stage,reward:{crys:2}},
+  {id:'awake',icon:'wish',name:'因你而觉醒',desc:'完成第一次觉醒',need:4,get:()=>P.stage,reward:{crys:3}}
+];
+function claimMilestone(id){const m=MILESTONES.find(x=>x.id===id);if(!m||m.get()<m.need||P.milestones.includes(id))return;
+  P.milestones.push(id);addReward(m.reward);petSave();sfx('rare');flash();renderHome();renderDex();
+  toast('✦ 旅途印记 · '+m.name+' · '+rewardText(m.reward),2800)}
+function renderDailyStrip(){const b=$('#dailyStrip');if(!b||!P)return;const w=ensureWishes(),ts=dailyTasks();
+  const complete=ts.filter(t=>t.now>=t.need).length,claimed=w.claimed.length;
+  const sub=w.bonus?'今日已经圆满 · 明天还有新的小事':complete===3&&!w.bonus?'三个星愿已完成 · 去领取今日星光':(complete+' / 3 完成 · '+claimed+' 份奖励已收好');
+  b.innerHTML=uiIcon('wish','wishIco')+'<span class="wishCopy"><span class="wishTitle">今日星愿</span><span class="wishSub">'+sub+'</span></span><span class="wishDots">'+
+    ts.map(t=>'<i class="'+(t.now>=t.need?'on':'')+'"></i>').join('')+'</span>'}
 window.addEventListener('storage',e=>{if(e.key===SAVEKEY||e.key===PKEY){const p2=loadPet();if(p2&&P&&(p2.ts||0)>(P.ts||0)){P=p2;renderHome()}}});
 /* 身份 */
 function identity(){const m=freshMeta();
@@ -852,6 +941,8 @@ function settle(){if(P)chalSettle(); // M3: 周翻页先结算对拼（compW 尚
   if(away<30*6e4){setTrip('nap');return}
   const hours=Math.min(away/36e5,72);
   let n=clamp(Math.floor(hours/6),1,4);
+  const route=ROUTES[P.trip.mode]?P.trip.mode:'story';
+  if(route==='story'&&hours>=6)n=Math.min(4,n+1);
   const idn=identity();
   const recent=P.mail.slice(0,20).map(m=>m.id);
   const backlog=away>72*36e5;
@@ -859,15 +950,17 @@ function settle(){if(P)chalSettle(); // M3: 周翻页先结算对拼（compW 尚
   for(let i=0;i<n;i++){
     const rng=mulberry32(hash32(idn.id+'|'+dayIdx()+'|'+(P.seq++)));
     let r=rng(),rar;
-    const bonus=P.streak>=7?.05:0;
-    if(r<.01)rar='SP';else if(r<.08)rar='SR';else if(r<.30+bonus)rar='R';else rar='N';
+    const bonus=P.streak>=7?.05:0,treasure=route==='treasure';
+    if(r<.01)rar='SP';else if(r<(treasure ? .13 : .08))rar='SR';else if(r<(treasure ? .42 : .30)+bonus)rar='R';else rar='N';
     let pool;
     if(rar==='SP')pool=['sp1','sp2','sp3','sp4'];
     else{const loc=P.trip.loc;
       pool=Object.keys(EVDB).filter(k=>{const e=EVDB[k];if(e.loc!==loc)return false;
         if(rar==='N')return e.ty==='p'||(e.ty==='i'&&e.rar==='N');
         if(rar==='R')return e.ty==='e'||(e.ty==='i'&&e.rar==='R');
-        return e.ty==='s'||(e.ty==='i'&&e.rar==='SR')})}
+        return e.ty==='s'||(e.ty==='i'&&e.rar==='SR')});
+      /* 寻光拾遗不会凭空加奖励，只让同稀有度中的纪念品更容易被选中。 */
+      if(treasure){const itemPool=pool.filter(k=>EVDB[k].ty==='i');if(itemPool.length&&rng()<.58)pool=itemPool}}
     let fresh=pool.filter(k=>!recent.includes(k)&&!newMails.some(m=>m.id===k));
     let again=false;if(!fresh.length){fresh=pool;again=true}
     const id=fresh[Math.floor(rng()*fresh.length)];
@@ -876,11 +969,14 @@ function settle(){if(P)chalSettle(); // M3: 周翻页先结算对拼（compW 尚
       ps:(P.streak>=7&&Math.random()<.6)?Math.floor(Math.random()*PSPOOL.length):-1});
     recent.push(id)}
   newMails.forEach(m=>P.mail.unshift(m));
+  newMails.forEach(m=>{if(EVDB[m.id]&&!P.journal.includes(m.id))P.journal.push(m.id)});
+  if(newMails.length)P.journeys=(P.journeys||0)+1;
   if(backlog&&newMails.length)sysMailObj('backlog','行囊满满地回来啦','这些天我走了好多地方，行囊都快装不下了。\n挑了最想讲的写给你——剩下的，见面再说。'); // 摘要信最后 unshift，排在最上方
   P.mail=P.mail.slice(0,60);
   /* 被动成长 */
   const td=todayStr();if(P.pxDay!==td){P.pxDay=td;P.pxV=0}
-  const px=Math.min(Math.floor(hours*.5*stageMult()),12-P.pxV);
+  const pxRate=route==='study' ? .85 : .5,pxCap=route==='study'?18:12;
+  const px=Math.min(Math.floor(hours*pxRate*stageMult()),pxCap-P.pxV);
   if(px>0){P.pxV+=px;P.xp+=px}
   /* 心情 */
   if(away>48*36e5){P.mood=0;
@@ -1036,6 +1132,9 @@ function showView(v){$$('.view').forEach(e=>e.classList.remove('on'));
 document.addEventListener('click',e=>{
   const nb=e.target.closest('[data-v]');
   if(nb){sfx('tap');showView(nb.dataset.v)}});
+$('#dailyStrip').addEventListener('click',()=>{dexTab='wishes';
+  $$('#vDex .tab').forEach(t=>t.classList.toggle('cur',t.dataset.t==='wishes'));
+  sfx('tap');showView('dex')});
 /* ================= 主屏 ================= */
 function stageName(){
   if(P.stage>=4){const f=formOf(P.form);return f?('觉醒 · '+f.n.replace('因子','')):'觉醒星灵'}
@@ -1044,7 +1143,7 @@ function setTrip(kind,n){const el=$('#tripLine');const loc=LOCS[P.trip.loc];
   if(P.stage===0){el.innerHTML='蛋壳里偶尔传来小小的心跳';return}
   if(kind==='nap')el.innerHTML='星灵在窝里打盹，尾巴一翘一翘的';
   else if(kind==='back')el.innerHTML=`刚从 <em>${loc.name}</em> 回来 · 带了 ${n} 封信`;
-  else el.innerHTML=`下次远征目的地 · <em>${loc.name}</em>`}
+  else el.innerHTML=`下次远征 · <em>${loc.name}</em> · ${ROUTES[P.trip.mode||'story'].name}`}
 function updateXpUI(){
   if(P.stage>=4){const f=formOf(P.form);
     $('#xpStage').textContent='觉醒 · '+(f?f.n:'');$('#xpNum').textContent='✦';
@@ -1056,6 +1155,7 @@ function updateXpUI(){
   $('#xpNum').textContent=(P.stage===3&&P.xp>=2000)?('觉醒之夜 · 照料 '+(P.careD||0)+'/30 天'):(Math.floor(P.xp)+' / '+st.need);
   $('#xpBar').style.width=pct+'%'}
 function renderHome(){if(!P)return;
+  ensureWishes();
   const idn=identity();
   $('#hdrName').innerHTML='✧ <b>'+esc(P.name||'星灵')+'</b>'+(idn.name?'<span style="font-size:10px;color:var(--ink3)"> · '+esc(idn.name)+'</span>':'');
   $('#hdrStage').textContent=stageName()+' · 连 '+P.streak+' 天';
@@ -1072,7 +1172,7 @@ function renderHome(){if(!P)return;
   $('#bFeedC').classList.toggle('hot',P.crys>=1);
   if(P.stage===0){$('#bFeedS').querySelector('small').textContent='5 ✦ · 暖蛋 8';
     $('#bFeedC').querySelector('small').textContent='1 💠 · 暖蛋 40'}
-  renderPet();updateXpUI();renderMailBadge();
+  renderPet();updateXpUI();renderMailBadge();renderDailyStrip();
   const tips={0:'它在等你回来',1:'摸摸它试试',2:'今天也辛苦啦',3:'它现在特别高兴'};
   $('#moodTip').textContent=P.stage===0?'轻轻摸一摸蛋壳':(tips[P.mood]||'');
   $('#moodTip').classList.add('on');setTimeout(()=>$('#moodTip').classList.remove('on'),3600)}
@@ -1085,7 +1185,8 @@ function esc(s){return String(s||'').replace(/[<>&"']/g,c=>({'<':'&lt;','>':'&gt
 $('#petBreath').addEventListener('pointerdown',e=>{if(!P)return;ac();
   const w=$('#petBreath');w.classList.remove('squish');void w.offsetWidth;w.classList.add('squish');
   sfx('purr');burst(e.clientX,e.clientY,8);
-  if(P.stage===0){grantXp(1,'p');petSave();return}
+  wishProgress('pat',1);
+  if(P.stage===0){grantXp(1,'p');petSave();renderDailyStrip();return}
   const td=todayStr();if(P.patDay!==td){P.patDay=td;P.patN=0}
   P.diet.p++;
   if(P.patN<3){P.patN++;P.dust++;floatNum($('#petZone'),'+1 ✦');sfx('coin')}
@@ -1124,7 +1225,7 @@ function feed(kind){if(!P)return;
     if(kind==='k'){flash();burst(z.left+z.width/2,z.top+z.height/2,26);sfx('rare')}
     floatNum($('#petZone'),'+'+xp,kind==='k'?'#e8c768':'');
     P.mood=3;P.lastCare=todayStr();addComp(kind==='k'?5:2);
-    noteNight();grantXp(xp,kind);petSave();renderHome()},520)}
+    wishProgress('feed',1);noteNight();grantXp(xp,kind);petSave();renderHome()},520)}
 $('#bFeedS').addEventListener('click',()=>feed('s'));
 $('#bFeedC').addEventListener('click',()=>feed('k'));
 /* ================= 信箱 ================= */
@@ -1169,7 +1270,7 @@ function openLetter(i){const m=P.mail[i];if(!m)return;const ev=evOf(m);if(!ev)re
         sfx(r==='SP'||r==='SR'?'rare':'coin');
         const rc=card.getBoundingClientRect();burst(rc.left+rc.width/2,rc.top+rc.height/2,r==='SP'?30:16);
         $('#dexDot').classList.add('on');petSave()}},900)}
-  if(!m.rd){m.rd=1;
+  if(!m.rd){m.rd=1;P.lettersRead=(P.lettersRead||0)+1;
     if(!P.dex.locs.includes(m.loc))P.dex.locs.push(m.loc);
     petSave()}
   if(m.rar==='SP')sfx('rare');
@@ -1230,7 +1331,7 @@ function renderDex(){$('#dexDot').classList.remove('on');const B=$('#dexBody');
         <div class="lb"><div class="ln"><span class="locSeal">${got?L.seal:'?'}</span>${got?L.name:'？？？'}</div>
         <div class="ld">${got?L.desc:'它还没有把这里的故事带回来'}</div>
         <div class="locMeta"><span>${got?'已记录':'未抵达'}</span><span>${STAGES[L.need].n}</span></div></div></div>`}).join('')}
-  else{const got=P.dex.forms||[];
+  else if(dexTab==='forms'){const got=P.dex.forms||[];
     $('#dexCnt').textContent=got.length?('觉醒 '+got.length+' / '+FORMS.length):'觉醒 · 前夜';
     const stageSeen=['蛋','幼年','少年','成体','✦觉醒'].slice(0,Math.min(P.stage,4)+1);
     B.innerHTML='<div style="font-size:11px;color:var(--ink3);letter-spacing:.12em;line-height:2;margin-bottom:12px">成长足迹：'+
@@ -1249,23 +1350,58 @@ function renderDex(){$('#dexDot').classList.remove('on');const B=$('#dexBody');
             :'<div style="font-size:8.5px;color:var(--ink4);padding:0 6px;text-align:center;line-height:1.6">'+hint+'</div>'}</div>`}).join('')+
       '</div><div style="font-size:10.5px;color:var(--ink4);letter-spacing:.1em;text-align:center;margin-top:16px;line-height:2">'+
       (got.length?'它记得你是怎么喂它的——这就是答案。':'它长大之后，会记得你是怎么喂它的。<br>——觉醒之夜见。')+'</div>';
-    $$('#dexBody [data-morph]').forEach(b=>b.onclick=()=>{morphTo(b.dataset.morph);renderDex()})}}
+    $$('#dexBody [data-morph]').forEach(b=>b.onclick=()=>{morphTo(b.dataset.morph);renderDex()})}
+  else{
+    const w=ensureWishes(),tasks=dailyTasks(),done=tasks.filter(t=>t.now>=t.need).length;
+    const daily=tasks.map((t,i)=>{const got=w.claimed.includes(t.id),ready=t.now>=t.need;
+      return `<div class="wishCard ${ready?'done':''}" style="animation-delay:${i*.05}s">
+        <div class="wishMedal">${uiIcon(t.icon)}</div><div class="wishMain"><div class="wishName">${t.name}</div>
+        <div class="wishDesc">${t.desc} · 奖励 ${rewardText(t.reward)}</div><div class="wishProg">${t.now} / ${t.need}</div></div>
+        <button class="claimBtn ${got?'got':''}" data-wish="${t.id}" ${(!ready||got)?'disabled':''}>${got?'已收好':ready?'领 取':'进行中'}</button></div>`}).join('');
+    const bonusReady=tasks.every(t=>w.claimed.includes(t.id));
+    const bonus=`<div class="wishCard ${bonusReady?'done':''}" style="border-color:${bonusReady?'var(--gold3)':'var(--line2)'}">
+      <div class="wishMedal">${uiIcon('wish')}</div><div class="wishMain"><div class="wishName">点亮今日星图</div>
+      <div class="wishDesc">收好三份星愿奖励 · 额外获得 💠 1</div><div class="wishProg">${w.bonus?'今日圆满':done+' / 3 已完成'}</div></div>
+      <button class="claimBtn ${w.bonus?'got':''}" data-wish-bonus="1" ${(!bonusReady||w.bonus)?'disabled':''}>${w.bonus?'已点亮':bonusReady?'点 亮':'未完成'}</button></div>`;
+    const marks=MILESTONES.map((m,i)=>{const now=Math.min(m.get(),m.need),got=P.milestones.includes(m.id),ready=now>=m.need;
+      return `<div class="wishCard ${ready?'done':''}" style="animation-delay:${i*.04}s">
+        <div class="wishMedal">${uiIcon(m.icon)}</div><div class="wishMain"><div class="wishName">${m.name}</div>
+        <div class="wishDesc">${m.desc} · ${rewardText(m.reward)}</div><div class="wishProg">${now} / ${m.need}</div></div>
+        <button class="claimBtn ${got?'got':''}" data-mark="${m.id}" ${(!ready||got)?'disabled':''}>${got?'已镌刻':ready?'镌 刻':'未达成'}</button></div>`}).join('');
+    $('#dexCnt').textContent='今日 '+done+' / 3 · 旅途 '+P.milestones.length+' / '+MILESTONES.length;
+    B.innerHTML='<div class="sectionCap"><span>今 日 星 愿</span><b>不催你，明天会重写</b></div>'+daily+bonus+
+      '<div class="sectionCap" style="margin-top:18px"><span>旅 途 印 记</span><b>长久目标</b></div>'+marks;
+    $$('#dexBody [data-wish]').forEach(b=>b.onclick=()=>claimWish(b.dataset.wish));
+    const wb=$('#dexBody [data-wish-bonus]');if(wb)wb.onclick=claimWishBonus;
+    $$('#dexBody [data-mark]').forEach(b=>b.onclick=()=>claimMilestone(b.dataset.mark));
+  }}
 function pcArtInner(loc){return pcArt(loc).replace(/^<div[^>]*><svg[^>]*>/,'').replace('</svg></div>','')}
 /* ================= 远征地图 ================= */
 function renderMap(){const L=$('#mapList');
-  L.innerHTML=Object.keys(LOCS).map((k,i)=>{const o=LOCS[k];
+  const mode=P.trip.mode||'story';
+  const route=`<div class="routePanel"><div class="routeHead"><b>这一次，怎么走？</b><span>${ROUTES[mode].desc}</span></div>
+    <div class="modeGrid">${Object.keys(ROUTES).map(k=>{const m=ROUTES[k];return `<button class="modeBtn ${mode===k?'cur':''}" data-mode="${k}">
+      ${uiIcon(m.icon)}${m.name}<small>${m.tip}</small></button>`}).join('')}</div></div>`;
+  L.innerHTML=route+Object.keys(LOCS).map((k,i)=>{const o=LOCS[k];
     const open=P.stage>=o.need,cur=P.trip.loc===k;
+    const total=Object.keys(EVDB).filter(id=>EVDB[id].loc===k).length;
+    const found=(P.journal||[]).filter(id=>EVDB[id]&&EVDB[id].loc===k).length;
+    const pct=Math.round(found/Math.max(1,total)*100);
     return `<div class="locCard ${open?'':'lock'} ${cur?'cur':''}" data-loc="${k}" style="animation-delay:${i*.08}s">
       ${cur?'<div class="flag">目的地</div>':''}
       <div class="sil"><svg viewBox="0 0 160 84" preserveAspectRatio="xMidYMax slice">${pcArtInner(k)}</svg></div>
       <div class="lb"><div class="ln"><span class="locSeal">${o.seal}</span>${o.name}</div>
       <div class="ld">${open?o.desc:'需要 · '+STAGES[o.need].n+'（它还太小，去不了那么远）'}</div>
-      <div class="locMeta"><span>${open?'可远征':'未解锁'}</span><span>${cur?'当前目的地':'需要 '+STAGES[o.need].n}</span></div></div></div>`}).join('')+
+      <div class="locMeta"><span>${open?'探索 '+found+' / '+total:'未解锁'}</span><span>${cur?ROUTES[mode].name:'需要 '+STAGES[o.need].n}</span></div>
+      ${open?'<div class="explore"><i style="width:'+pct+'%"></i></div>':''}</div></div>`}).join('')+
   '<div style="text-align:center;font-size:10.5px;color:var(--ink4);letter-spacing:.14em;padding:8px 0 16px;line-height:2.2">选好去处，把页面收起来——<br>它就出发了。你回来时，信就在信箱里。</div>'}
-$('#mapList').addEventListener('click',e=>{const c=e.target.closest('.locCard');if(!c)return;
+$('#mapList').addEventListener('click',e=>{const mb=e.target.closest('.modeBtn');if(mb){
+    P.trip.mode=ROUTES[mb.dataset.mode]?mb.dataset.mode:'story';P.trip.t0=NOW();petSave();sfx('coin');renderMap();
+    toast('✧ 远征方式 · '+ROUTES[P.trip.mode].name);return}
+  const c=e.target.closest('.locCard');if(!c)return;
   const k=c.dataset.loc;if(P.stage<LOCS[k].need){toast('它踮起脚看了看远方——还差一点点长大');return}
   P.trip.loc=k;P.trip.t0=NOW();petSave();sfx('coin');renderMap();
-  toast('✧ 下次远征 · '+LOCS[k].name)});
+  toast('✧ 下次远征 · '+LOCS[k].name+' · '+ROUTES[P.trip.mode||'story'].name)});
 /* ================= 星友（社交） ================= */
 let palTab='visit';
 $$('#vPals .tab').forEach(t=>t.addEventListener('click',()=>{sfx('tap');palTab=t.dataset.p;
