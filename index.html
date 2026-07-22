@@ -1213,7 +1213,12 @@ $('#bCheck').addEventListener('click',()=>{if(!P)return;const td=todayStr();
   floatNum($('#petZone'),'+'+gain+' ✦');sfx('coin');
   if(P.streak===7){toast('✨ 连续 7 天！远征更容易遇见稀罕事了');sfx('rare')}
   if(P.streak===14&&P.freeze<3){P.freeze++;toast('❄ 获得一枚冻结符（考试周护身）')}
-  if(P.streak===30&&!P.dex.items.includes('i13')){toast('🌟 连续三十天！它一定有话想对你说');}
+  // ⚠ 以前这里只弹一句 toast,金色银杏叶(i13·SP)从不发放——三十天连签是最长的养成承诺,落空最伤留存。
+  //   ===30 改 >=30 配 includes 守卫:错过唯一那天(冻结续签/跨天登陆)也补得上,且只发一次。
+  if(P.streak>=30&&!P.dex.items.includes('i13')){P.dex.items.push('i13');
+    sysLetter('gift30','连续三十天',EVDB.sp3.x); // 复用金色银杏叶那封信文
+    toast('🌟 连续三十天！金色银杏叶入册——它一定有话想对你说');sfx('rare');
+    if($('#dexDot'))$('#dexDot').classList.add('on');}
   noteNight();petSave();renderHome()});
 /* 喂食 */
 function feed(kind){if(!P)return;
@@ -1260,7 +1265,7 @@ function openLetter(i){const m=P.mail[i];if(!m)return;const ev=evOf(m);if(!ev)re
   let extra='';
   if(ev.ty==='p'||ev.ty==='sys'&&false)extra=pcArt(m.loc);
   if(ev.ty==='e'){const img=ev.who&&ART[ev.who];
-    extra=`<div class="meet"><div class="mp">${img?`<img src="${img}" onerror="this.remove();this.parentNode.innerHTML='<span class=mg>${ev.g||ev.wn[0]}</span>'">`:`<span class="mg">${ev.g||ev.wn[0]}</span>`}</div>
+    extra=`<div class="meet"><div class="mp">${img?`<img src="${img}" onerror="this.outerHTML='<span class=mg>${ev.g||ev.wn[0]}</span>'">`:`<span class="mg">${ev.g||ev.wn[0]}</span>`}</div>
     <div class="mn">偶遇 · ${esc(ev.wn)}</div></div>`}
   $('#rdExtra').innerHTML=extra;
   $('#rdBody').textContent=(m.ag?'（我又去了一次——有些地方，值得再讲一遍。）\n':'')+ev.x;
@@ -1537,6 +1542,7 @@ $('#hNameGo').addEventListener('click',()=>{
   petSave();sfx('hatch');flash();
   toast('从现在起，它叫「'+n+'」');
   showView('home');renderHome();
+  urlCode(); // ⚠ 新玩家带 ?code= 进来时,boot() 在 !P 处就 return 了、urlCode 从没跑过 → 扫码兑换码永远不入袋。孵化取名后补跑一次。
   setTimeout(()=>toast('先摸摸蛋壳，或者喂它一点星尘——暖一暖，它就快出来了',3200),2400)});
 /* 破壳 / 进化仪式 */
 function rite(txt,sub,cb){const r=$('#rite');
